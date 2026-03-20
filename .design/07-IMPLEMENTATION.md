@@ -558,6 +558,45 @@ client/
 
 ---
 
+## CI / GitHub Actions
+
+Automated testing runs on every push and pull request to `main`/`master`.
+
+### Workflow: `.github/workflows/ci.yml`
+
+```yaml
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+```
+
+### Jobs
+
+| Job | Runs | When |
+|-----|------|------|
+| `test` | Ubuntu latest | Every push/PR |
+| `cypress` | Ubuntu latest | After `test` passes |
+
+### Job: `test`
+- Server: `npm test` (Jest unit tests against MySQL service)
+- Client: `npm test` (Vitest unit tests)
+- Client: `npm run build` (production build)
+
+### Job: `cypress` (E2E)
+- Uses `docker-compose --env-file .env.test` to spin up nginx + server + client
+- Runs Cypress E2E tests against nginx proxy
+- Uploads recordings on failure
+
+### Secrets (Repository Settings)
+
+| Secret | Description |
+|--------|-------------|
+| None required | Uses `.env.test` with SQLite-compatible vars |
+
+---
+
 ## Windows Desktop App (Tauri)
 
 The React client is wrapped with **Tauri** to produce a native Windows `.exe` / `.msi` installer.

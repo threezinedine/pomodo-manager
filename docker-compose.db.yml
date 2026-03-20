@@ -1,0 +1,30 @@
+# Standalone MySQL databases — run separately from the app stack.
+#
+# Usage (each with its matching .env file):
+#   dev    → docker compose -f docker-compose.db.yml --env-file .env.dev --profile dev up -d
+#   test   → docker compose -f docker-compose.db.yml --env-file .env.test --profile test up -d
+#   prod   → docker compose -f docker-compose.db.yml --env-file .env.prod --profile prod up -d
+#   all    → docker compose -f docker-compose.db.yml --env-file .env.dev --profile dev,test,prod up -d
+
+services:
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "${MYSQL_HOST_PORT:-3306}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  mysql_data:

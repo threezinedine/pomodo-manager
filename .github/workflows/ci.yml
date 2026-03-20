@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: pomodoro
+          MYSQL_USER: pomodoro
+          MYSQL_PASSWORD: pomodoro
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-paths: "**/package-lock.json"
+
+      # ── Server ──────────────────────────────────────────────────────────────
+
+      - name: Install server dependencies
+        run: npm install
+        working-directory: ./server
+
+      - name: Run server unit tests
+        run: npm test
+        working-directory: ./server
+        env:
+          NODE_ENV: test
+          DATABASE_PROVIDER: mysql
+          DATABASE_URL: mysql://pomodoro:pomodoro@127.0.0.1:3306/pomodoro
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: 3306
+          MYSQL_USER: pomodoro
+          MYSQL_PASSWORD: pomodoro
+          MYSQL_DATABASE: pomodoro
+
+      # ── Client ──────────────────────────────────────────────────────────────
+
+      - name: Install client dependencies
+        run: npm install
+        working-directory: ./client
+
+      - name: Run client unit tests
+        run: npm test
+        working-directory: ./client
+        env:
+          NODE_ENV: test
+          VITE_API_URL: http://localhost/api
+
+      - name: Build client
+        run: npm run build
+        working-directory: ./client
+        env:
+          NODE_ENV: production
+          VITE_API_URL: http://localhost/api
+
+  cypress:
+    name: Cypress E2E
+    runs-on: ubuntu-latest
+    needs: test
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: pomodoro
+          MYSQL_USER: pomodoro
+          MYSQL_PASSWORD: pomodoro
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-paths: "**/package-lock.json"
+
+      - name: Copy env file
+        run: cp .env.test .env
+
+      - name: Build and start services
+        run: docker-compose --env-file .env up --build -d
+
+      - name: Wait for services to be ready
+        run: sleep 15
+
+      - name: Install Cypress dependencies
+        run: npm install
+        working-directory: ./cypress
+
+      - name: Run Cypress E2E tests
+        run: npx cypress run
+        working-directory: ./cypress
+        env:
+          CYPRESS_BASEURL: http://localhost
+
+      - name: Upload Cypress recordings
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-recordings
+          path: cypress/videos/
+          retention-days: 7
+
+      - name: Tear down services
+        if: always()
+        run: docker-compose --env-file .env down -v

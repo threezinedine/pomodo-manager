@@ -1,0 +1,58 @@
+services:
+
+  # ── Always running ──────────────────────────────────────────
+
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      - server
+      - client
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
+
+  server:
+    build:
+      context: ./server
+      args:
+        - DATABASE_PROVIDER=${DATABASE_PROVIDER}
+        - DATABASE_URL=${DATABASE_URL}
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - DATABASE_PROVIDER=${DATABASE_PROVIDER}
+      - DATABASE_URL=${DATABASE_URL}
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  client:
+    build:
+      context: ./client
+      args:
+        - NODE_ENV=${NODE_ENV}
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_CLIENT_URL=${VITE_CLIENT_URL}
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+      - ./client/dist:/app/dist
+
+  # ── Test only ────────────────────────────────────────────────
+
+  cypress:
+    image: cypress/included:13
+    depends_on:
+      - nginx
+    environment:
+      - CYPRESS_BASEURL=${CYPRESS_BASEURL}
+    volumes:
+      - ./cypress:/cypress
+      - ./cypress.config.ts:/cypress.config.ts
+    working_dir: /cypress
+    command: npx cypress run
+    profiles:
+      - test
