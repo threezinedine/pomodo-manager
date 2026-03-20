@@ -1,22 +1,23 @@
-# Standalone MySQL databases — run separately from the app stack.
+# Standalone MySQL databases for local development.
+# Production DB runs inside docker-compose.yml (profile: prod).
 #
-# Usage (each with its matching .env file):
+# Usage:
 #   dev    → docker compose -f docker-compose.db.yml --env-file .env.dev --profile dev up -d
 #   test   → docker compose -f docker-compose.db.yml --env-file .env.test --profile test up -d
-#   prod   → docker compose -f docker-compose.db.yml --env-file .env.prod --profile prod up -d
-#   all    → docker compose -f docker-compose.db.yml --env-file .env.dev --profile dev,test,prod up -d
 
 services:
 
-  mysql:
+  mysql-dev:
     image: mysql:8
+    profiles:
+      - dev
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_dev_data:/var/lib/mysql
     ports:
       - "${MYSQL_HOST_PORT:-3306}:3306"
     healthcheck:
@@ -26,5 +27,26 @@ services:
       retries: 10
       start_period: 30s
 
+  mysql-test:
+    image: mysql:8
+    profiles:
+      - test
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_test_data:/var/lib/mysql
+    ports:
+      - "${MYSQL_HOST_PORT:-3307}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
 volumes:
-  mysql_data:
+  mysql_dev_data:
+  mysql_test_data:

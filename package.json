@@ -1,0 +1,31 @@
+{
+  "name": "pomodoro-manager",
+  "version": "1.0.0",
+  "description": "Pomodoro Manager — full-stack app",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"SERVER,CLIENT\" --prefixColors \"blue,green\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "dotenv -e .env.dev -- npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix server run build && npm --prefix client run build",
+    "test": "npm run test:client",
+    "test:client": "npm --prefix client run test",
+    "test:server": "npm --prefix server run test",
+    "storybook": "npm --prefix client run storybook",
+    "test:e2e": "npm run db:start:test && docker compose --env-file .env.test up --build --profile test --abort-on-container-exit && npm run db:stop:test",
+    "db:start:dev": "docker compose -f docker-compose.db.yml --env-file .env.dev --profile dev up -d",
+    "db:start:test": "docker compose -f docker-compose.db.yml --env-file .env.test --profile test up -d",
+    "db:start:prod": "docker compose -f docker-compose.db.yml --env-file .env.prod --profile prod up -d",
+    "db:start:all": "docker compose -f docker-compose.db.yml --env-file .env.dev --profile dev up -d && docker compose -f docker-compose.db.yml --env-file .env.test --profile test up -d && docker compose -f docker-compose.db.yml --env-file .env.prod --profile prod up -d",
+    "db:stop:dev": "docker compose -f docker-compose.db.yml --env-file .env.dev --profile dev down -v",
+    "db:stop:test": "docker compose -f docker-compose.db.yml --env-file .env.test --profile test down -v",
+    "db:stop:prod": "docker compose -f docker-compose.db.yml --env-file .env.prod --profile prod down -v",
+    "db:stop:all": "docker compose -f docker-compose.db.yml --env-file .env.dev --profile dev down -v && docker compose -f docker-compose.db.yml --env-file .env.test --profile test down -v && docker compose -f docker-compose.db.yml --env-file .env.prod --profile prod down -v",
+    "prod": "docker compose --env-file .env.prod up --build -d",
+    "prod:stop": "docker compose --env-file .env.prod down"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "dotenv-cli": "^7.4.2"
+  }
+}

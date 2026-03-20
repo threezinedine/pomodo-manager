@@ -41,7 +41,29 @@ services:
       - /app/node_modules
       - ./client/dist:/app/dist
 
-  # ── Test only ────────────────────────────────────────────────
+  # ── Production ──────────────────────────────────────────────
+
+  db:
+    image: mysql:8
+    profiles:
+      - prod
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "${MYSQL_HOST_PORT:-3306}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ── Test ───────────────────────────────────────────────────
 
   cypress:
     image: cypress/included:13
@@ -56,3 +78,6 @@ services:
     command: npx cypress run
     profiles:
       - test
+
+volumes:
+  mysql_data:
