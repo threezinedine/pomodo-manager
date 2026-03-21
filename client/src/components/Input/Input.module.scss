@@ -1,0 +1,198 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.withMargin {
+  margin-top: 1.5rem;
+}
+
+// ── Label ──────────────────────────────────────────────────
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text, #1e293b);
+}
+
+// ── Input Wrap (border + icons) ────────────────────────────
+
+.inputWrap {
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  background-color: var(--color-bg, #ffffff);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+
+  &:focus-within {
+    border-color: var(--color-primary, #6366f1);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #6366f1) 20%, transparent);
+    outline: none;
+  }
+}
+
+// ── Sizes ──────────────────────────────────────────────────
+
+.sm {
+  height: 2rem;
+  font-size: 0.8125rem;
+
+  .input {
+    font-size: inherit;
+    padding: 0 0.75rem;
+  }
+
+  .leftIcon,
+  .rightIcon {
+    &:first-child { padding-left: 0.625rem; }
+    &:last-child  { padding-right: 0.625rem; }
+
+    svg { width: 0.875rem; height: 0.875rem; }
+  }
+}
+
+.md {
+  height: 2.5rem;
+  font-size: 1rem;
+
+  .input {
+    font-size: inherit;
+    padding: 0 1rem;
+  }
+
+  .leftIcon,
+  .rightIcon {
+    &:first-child { padding-left: 0.75rem; }
+    &:last-child  { padding-right: 0.75rem; }
+
+    svg { width: 1rem; height: 1rem; }
+  }
+}
+
+.lg {
+  height: 3rem;
+  font-size: 1.125rem;
+
+  .input {
+    font-size: inherit;
+    padding: 0 1.25rem;
+  }
+
+  .leftIcon,
+  .rightIcon {
+    &:first-child { padding-left: 1rem; }
+    &:last-child  { padding-right: 1rem; }
+
+    svg { width: 1.125rem; height: 1.125rem; }
+  }
+}
+
+// ── Native Input ───────────────────────────────────────────
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text, #1e293b);
+  font-family: inherit;
+
+  &::placeholder {
+    color: var(--color-text-muted, #94a3b8);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// ── Icons ──────────────────────────────────────────────────
+
+.leftIcon,
+.rightIcon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--color-text-muted, #94a3b8);
+  pointer-events: none;
+
+  svg {
+    display: block;
+  }
+}
+
+// ── Error ──────────────────────────────────────────────────
+
+.error {
+  border-color: var(--color-danger, #ef4444);
+
+  &:focus-within {
+    border-color: var(--color-danger, #ef4444);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger, #ef4444) 20%, transparent);
+  }
+}
+
+.errorText {
+  font-size: 0.8125rem;
+  color: var(--color-danger, #ef4444);
+  font-weight: 500;
+}
+
+// ── Helper Text ────────────────────────────────────────────
+
+.helperText {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+// ── Disabled ───────────────────────────────────────────────
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+// ── Loading ───────────────────────────────────────────────
+
+.loading {
+  cursor: wait;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 1rem;
+  color: var(--color-text-muted, #94a3b8);
+  animation: spin 0.8s linear infinite;
+
+  svg {
+    display: block;
+    width: 1em;
+    height: 1em;
+  }
+}
+
+.loadingText {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #94a3b8);
+}
+
