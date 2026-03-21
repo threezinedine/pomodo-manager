@@ -127,6 +127,58 @@ export const Loading: Story = {
   },
 };
 
+/** All variants in loading state — spinner replaces icons, button is non-interactive. */
+export const LoadingAllVariants: Story = {
+  render: () => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+      <Button variant="primary" loading>Primary</Button>
+      <Button variant="secondary" loading>Secondary</Button>
+      <Button variant="ghost" loading>Ghost</Button>
+      <Button variant="danger" loading>Danger</Button>
+    </div>
+  ),
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      description: {
+        story: 'Every variant renders a spinner and disables the button when `loading={true}`.',
+      },
+    },
+  },
+};
+
+/** All sizes in loading state. */
+export const LoadingSizes: Story = {
+  render: () => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+      <Button size="sm" loading>Small</Button>
+      <Button size="md" loading>Medium</Button>
+      <Button size="lg" loading>Large</Button>
+    </div>
+  ),
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      description: { story: 'Spinner scales correctly across `sm`, `md`, and `lg` sizes.' },
+    },
+  },
+};
+
+/** Loading with long label — verifies the spinner doesn't cause layout shift. */
+export const LoadingLongLabel: Story = {
+  args: {
+    loading: true,
+    children: 'Please wait while we process your request...',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Spinner is hidden and label is preserved when `loading={true}` — no layout shift.',
+      },
+    },
+  },
+};
+
 export const Disabled: Story = {
   args: {
     disabled: true,
