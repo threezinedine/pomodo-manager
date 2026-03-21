@@ -1,0 +1,41 @@
+// ── Base ──────────────────────────────────────────────────
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── Layout ─────────────────────────────────────────────────
+
+.vertical {
+  flex-direction: column;
+}
+
+.horizontal {
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+// ── Gap ─────────────────────────────────────────────────────
+
+.gap-sm {
+  gap: 0.5rem;
+}
+
+.gap-md {
+  gap: 1rem;
+}
+
+.gap-lg {
+  gap: 1.5rem;
+}
+
+// ── Full Width ──────────────────────────────────────────────
+
+.fullWidth {
+  width: 100%;
+
+  > * {
+    width: 100%;
+  }
+}
